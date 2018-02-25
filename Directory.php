@@ -2,11 +2,13 @@
 
 namespace IjorTengab\JsonDb;
 
+use IjorTengab\JsonDb\File;
+
 class Directory
 {
     protected $_dirname;
     protected $_files;
-    protected $_loaded = [];
+    protected $_loaded = array();
 
     public static $class = __CLASS__;
 
@@ -53,6 +55,7 @@ class Directory
      */
     public function __construct($dirname = null)
     {
+        clearstatcache();
         if ($dirname === null) {
             $dirname = getcwd();
         }
@@ -79,15 +82,13 @@ class Directory
      */
     public function __get($value)
     {
-        // $debugname = 'value'; echo "\r\n<pre>" . __FILE__ . ":" . __LINE__ . "\r\n". 'var_dump(' . $debugname . '): '; var_dump($$debugname); echo "</pre>\r\n";
-
         if ($this->hasFile($value)) {
             if (array_key_exists($value, $this->_loaded)) {
                 return  $this->_loaded[$value];
             }
             else {
                 $path = $this->_dirname . '/' . $value . '.json';
-                $this->_loaded[$value] = ModelJson::load($path);
+                $this->_loaded[$value] = File::load($path);
                 return  $this->_loaded[$value];
             }
         }
@@ -96,7 +97,7 @@ class Directory
                 return  $this->_loaded[$value];
             }
             else {
-                $this->_loaded[$value] = new ModelJson(null, []);
+                $this->_loaded[$value] = new File(null, array());
                 return  $this->_loaded[$value];
             }
         }
@@ -107,7 +108,7 @@ class Directory
      */
     public function hasFile($file)
     {
-        return in_array($file, $this->_files);
+        return in_array($file, (array) $this->_files);
     }
 
     /**
@@ -124,5 +125,13 @@ class Directory
     public function getFiles()
     {
         return $this->_files;
+    }
+
+    /**
+     *
+     */
+    public function getAbsolutePath()
+    {
+        return $this->_dirname;
     }
 }

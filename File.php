@@ -2,11 +2,13 @@
 
 namespace IjorTengab\JsonDb;
 
+use IjorTengab\JsonDb\Directory;
+
 class File
 {
     protected $_filename;
     protected $_attributes;
-    protected $_attributes_strange = [];
+    protected $_attributes_strange = array();
     public static $class = __CLASS__;
 
     /**
@@ -21,7 +23,7 @@ class File
         }
         // Jika tidak valid.
         if (null === $array) {
-            $array = [];
+            $array = array();
         }
         return new static::$class($filename, $array);
     }
@@ -90,8 +92,26 @@ class File
     /**
      *
      */
-    public function populate($info, $verifikator = [])
+    public function populate($info, $verifikator = array())
     {
         $this->_attributes = array_merge($this->_attributes, $info);
+    }
+
+    /**
+     *
+     */
+    public function getAbsolutePath()
+    {
+        return $this->_filename;
+    }
+
+    /**
+     *
+     */
+    public function symlinkTo(Directory $direktori)
+    {
+        $target = $this->_filename;
+        $link = $direktori->getAbsolutePath().'/'.basename($target);
+        return symlink($target, $link);
     }
 }
